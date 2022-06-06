@@ -4,16 +4,16 @@ from collections import OrderedDict
 
 from django import VERSION
 from django.apps import apps
-from django.contrib.auth.models import Permission
 from django.contrib.admin.widgets import FilteredSelectMultiple
+from django.contrib.auth.models import Permission
 from django.contrib.contenttypes.models import ContentType
-from django.forms import SelectMultiple
-from django.template.loader import get_template
 from django.utils.encoding import force_text
-from django.utils.safestring import mark_safe
-from .app_settings import EXCLUDE_FUNCTION, EXCLUDE_APPS, \
-    EXCLUDE_MODELS, TEMPLATE, USE_FOR_CONCRETE, TRANSLATION_FUNC, APPS_CUSTOMIZATION_FUNC, \
-    CUSTOM_PERMISSIONS_CUSTOMIZATION_FUNC
+from .app_settings import (
+    EXCLUDE_FUNCTION, EXCLUDE_APPS,
+    EXCLUDE_MODELS, USE_FOR_CONCRETE,
+    TRANSLATION_FUNC, APPS_CUSTOMIZATION_FUNC,
+    CUSTOM_PERMISSIONS_CUSTOMIZATION_FUNC,
+    TEMPLATE)
 from .helpers import get_perm_name
 
 
@@ -27,8 +27,10 @@ def get_reminder_permissions_iterator(choices, reminder_perms):
 
 
 class TabularPermissionsWidget(FilteredSelectMultiple):
-    class Media:
-        js = ('tabular_permissions/tabular_permissions.js',)
+    # Template that renders the widget
+    base_template_name = "django/forms/widgets/select.html"
+    # Template that renders the table and includes the widget
+    template_name = TEMPLATE
 
     def __init__(self, verbose_name, is_stacked, input_name='user_permissions', attrs=None, choices=()):
         super(TabularPermissionsWidget, self).__init__(verbose_name, is_stacked, attrs, choices)
@@ -36,7 +38,7 @@ class TabularPermissionsWidget(FilteredSelectMultiple):
         self.input_name = input_name  # in case of UserAdmin, it's 'user_permissions', GroupAdmin it's 'permissions'
         self.hide_original = True
 
-    def render(self, name, value, attrs=None, renderer=None):
+    def get_table_context(self, name, value, attrs):
         choices = self.choices
         apps_available = OrderedDict()  # []  # main container to send to template
         user_permissions = Permission.objects.filter(id__in=value or []).values_list('id', flat=True)
@@ -134,30 +136,35 @@ class TabularPermissionsWidget(FilteredSelectMultiple):
             colspan = 5
 
         apps_available = APPS_CUSTOMIZATION_FUNC(apps_available)
-        request_context = {'apps_available': apps_available, 'user_permissions': user_permissions,
-                           'codename_id_map': codename_id_map, 'input_name': self.input_name,
-                           'custom_permissions_available': custom_permissions_available,
-                           'colspan': colspan,
-                           'django_supports_view_permissions': VERSION >= (2, 1, 0), }
-        body = get_template(TEMPLATE).render(request_context).encode("utf-8")
+
         self.managed_perms = excluded_perms
         if reminder_perms:
             self.hide_original = False
 
         reminder_choices = get_reminder_permissions_iterator(choices, reminder_perms)
-
         # filter the left over permission
         reminder_choices = CUSTOM_PERMISSIONS_CUSTOMIZATION_FUNC(reminder_choices)
-        if not reminder_choices:
-            attrs['style'] = " display:none "
-            # switching to "normal" SelectMultiple as FilteredSelectMultiple will render the widget even
-            # if the style=display:none
-            original_class = SelectMultiple(attrs, reminder_choices)
-        else:
-            original_class = FilteredSelectMultiple(self.verbose_name, self.is_stacked, attrs, reminder_choices)
 
-        output = original_class.render(name, value, attrs, renderer)
+        ctx = {
+            'template_name': "tabular_permissions/admin/tabular_permissions.html",
+            'apps_available': apps_available,
+            'user_permissions': user_permissions,
+            'codename_id_map': codename_id_map,
+            'input_name': self.input_name,
+            'custom_permissions_available': custom_permissions_available,
+            'colspan': colspan,
+            'django_supports_view_permissions': VERSION >= (2, 1, 0),
+            'reminder_choices': reminder_choices
+        }
+        return ctx
 
-        initial = mark_safe(''.join(output))
-        response = ' <hr/>'.join([force_text(body), force_text(initial)])
-        return mark_safe(response)
+    def get_context(self, name, value, attrs):
+        ctx = self.get_table_context(name, value, attrs)
+        reminder_choices = ctx.get('reminder_choices', ())
+        context = super().get_context(name, reminder_choices, attrs)
+        context['widget']['base_template_name'] = self.base_template_name
+        context['widget']['table'] = ctx
+        return context
+
+    class Media:
+        js = ('tabular_permissions/tabular_permissions.js',)
