@@ -52,4 +52,4 @@ msgstr "Remover"
 
 #: templates/tabular_permissions/admin/tabular_permissions.html:44
 msgid "other permissions"
-msgstr "other permissões"
+msgstr "outras permissões"
