@@ -157,8 +157,7 @@ class TabularPermissionsWidget(FilteredSelectMultiple):
 
     def get_context(self, name, value, attrs):
         ctx = self.get_table_context(name, value, attrs)
-        reminder_choices = ctx.get('reminder_choices', ())
-        context = super().get_context(name, reminder_choices, attrs)
+        context = super().get_context(name, value, attrs)
         context['widget']['base_template_name'] = self.base_template_name
         context['widget']['table'] = ctx
         return context
