@@ -1,6 +1,6 @@
 {% load i18n %}
-<table id="tabular_permissions" class="table table-condensed table-striped table-hover" cellspacing="0" width="100%"
-       data-input-name="{{ widget.table.input_name }}">
+<table id="tabular_permissions" class="table table-condensed table-striped table-hover tabular-permissions"
+       style="width:100%" data-input-name="{{ widget.table.input_name }}">
     <thead>
     <tr>
         <th> {% trans 'application'|capfirst %}</th>
@@ -136,17 +136,16 @@
                         </label>
                     </div>
             {% endfor %}
-
             </td>
-        {% endif %}
+            {% endif %}
             </tr>
         {% endfor %}
+
         {% if app.models %}
             <tr>
                 <td colspan="{{ widget.table.colspan }}" class="user-permissions-app-separator"></td>
             </tr>
         {% endif %}
-
 
     {% endfor %}
     </tbody>
