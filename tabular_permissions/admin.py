@@ -13,7 +13,8 @@ class UserTabularPermissionsMixin(object):
     def formfield_for_manytomany(self, db_field, request=None, **kwargs):
         field = super(UserTabularPermissionsMixin, self).formfield_for_manytomany(db_field, request, **kwargs)
         if db_field.name == 'user_permissions':
-            field.widget = TabularPermissionsWidget(db_field.verbose_name, db_field.name in self.filter_vertical)
+            field.widget = TabularPermissionsWidget(verbose_name=db_field.verbose_name,
+                                                    is_stacked=db_field.name in self.filter_vertical)
             field.help_text = ''
         return field
 
@@ -22,8 +23,9 @@ class GroupTabularPermissionsMixin(object):
     def formfield_for_manytomany(self, db_field, request=None, **kwargs):
         field = super(GroupTabularPermissionsMixin, self).formfield_for_manytomany(db_field, request, **kwargs)
         if db_field.name == 'permissions':
-            field.widget = TabularPermissionsWidget(db_field.verbose_name, db_field.name in self.filter_vertical,
-                                                    'permissions')
+            field.widget = TabularPermissionsWidget(verbose_name=db_field.verbose_name,
+                                                    is_stacked=db_field.name in self.filter_vertical,
+                                                    input_name='permissions')
             field.help_text = ''
         return field
 

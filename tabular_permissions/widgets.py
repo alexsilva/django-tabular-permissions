@@ -32,7 +32,7 @@ class TabularPermissionsWidget(FilteredSelectMultiple):
     # Template that renders the table and includes the widget
     template_name = TEMPLATE
 
-    def __init__(self, verbose_name, is_stacked, input_name='user_permissions', attrs=None, choices=()):
+    def __init__(self, attrs=None, choices=(), verbose_name=None, is_stacked=False, input_name='user_permissions'):
         super(TabularPermissionsWidget, self).__init__(verbose_name, is_stacked, attrs, choices)
         self.managed_perms = []
         self.input_name = input_name  # in case of UserAdmin, it's 'user_permissions', GroupAdmin it's 'permissions'
