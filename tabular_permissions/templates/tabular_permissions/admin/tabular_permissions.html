@@ -51,7 +51,7 @@
 
         {% for model in app.models.values %}
 
-            <tr class="{% cycle 'row1' 'row2' %}">
+            <tr class="trow {% cycle 'row1' 'row2' %}" data-app-name="{{app.label}}">
 
                 {% if forloop.counter0 == 0 %}
                     <td rowspan="{{ app.models|length }}" class="app-name"
@@ -142,13 +142,14 @@
         {% endfor %}
 
         {% if app.models %}
-            <tr>
+            <tr class="trow" data-app-name="{{app.label}}">
                 <td colspan="{{ widget.table.colspan }}" class="user-permissions-app-separator"></td>
             </tr>
         {% endif %}
 
     {% endfor %}
     </tbody>
+    <tfoot></tfoot>
 </table>
 <hr/>
 
