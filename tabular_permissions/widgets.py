@@ -39,6 +39,19 @@ class TabularPermissionsWidget(FilteredSelectMultiple):
         self.hide_original = True
         self.org_choices = None
 
+    def get_extra_permissions(self, model, ct_id, codename_id_map):
+        """
+        :param model:
+        :param ct_id:
+        :param codename_id_map:
+        :return: dict {
+            'codename': codename,
+            'verbose_name': verbose_name,
+            'c_perm_id': c_perm_id
+        }
+        """
+        return ()
+
     def get_table_context(self, name, value, attrs):
         choices = self.choices if self.org_choices is None else self.org_choices
         apps_available = OrderedDict()  # []  # main container to send to template
@@ -92,15 +105,26 @@ class TabularPermissionsWidget(FilteredSelectMultiple):
                         )
                         model_custom_permissions_ids.append(c_perm_id)
 
-                if view_perm_id or add_perm_id or change_perm_id or delete_perm_id or model_custom_permissions:
-                    excluded_perms.update([view_perm_id, add_perm_id, change_perm_id, delete_perm_id] +
-                                          model_custom_permissions_ids)
+                extra_permissions = self.get_extra_permissions(model, ct_id, codename_id_map)
+
+                if (view_perm_id or add_perm_id or change_perm_id or delete_perm_id
+                        or model_custom_permissions or extra_permissions):
+
+                    excluded_perm_ids = [view_perm_id, add_perm_id, change_perm_id, delete_perm_id]
+                    excluded_perm_ids.extend(model_custom_permissions_ids)
+                    excluded_perm_ids.extend([perm['c_perm_id'] for perm in extra_permissions])
+                    excluded_perms.update(excluded_perm_ids)
+
                     reminder_perms.pop('%s_%s' % (view_perm_name, ct_id), False)
                     reminder_perms.pop('%s_%s' % (add_perm_name, ct_id), False)
                     reminder_perms.pop('%s_%s' % (change_perm_name, ct_id), False)
                     reminder_perms.pop('%s_%s' % (delete_perm_name, ct_id), False)
+
                     for c, v, _id in model_custom_permissions:
                         reminder_perms.pop('%s_%s' % (c, ct_id), False)
+
+                    for perm in extra_permissions:
+                        reminder_perms.pop('%s_%s' % (perm['codename'], ct_id), False)
 
                     # Because the logic of exclusion should/would work on both the tabular_permissin widget
                     # and the normal widget
@@ -122,6 +146,7 @@ class TabularPermissionsWidget(FilteredSelectMultiple):
                         'delete_perm_id': delete_perm_id,
                         'delete_perm_name': delete_perm_name,
                         'custom_permissions': model_custom_permissions,
+                        'extra_permissions': extra_permissions
                     }
 
             if app.models:

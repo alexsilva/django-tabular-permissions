@@ -39,6 +39,8 @@
                 {% trans 'All' %}
             </div>
         </th>
+
+        {% block extra_permission_headers %}{% endblock %}
         {% if  widget.table.custom_permissions_available %}
             <th>
             {% trans 'other permissions'|capfirst %}
@@ -122,6 +124,7 @@
                     </div>
                 {% endif %}
                 </td>
+            {% block extra_permission_rows %}{% endblock %}
             {% if  widget.table.custom_permissions_available %}
             <td>
             {% for custom_permission in model.custom_permissions %}
