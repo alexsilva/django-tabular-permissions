@@ -4,6 +4,7 @@ from django.utils.module_loading import import_string
 
 TABULAR_PERMISSIONS_CONFIG = {
 	'template': 'tabular_permissions/admin/tabular_permissions.html',
+	'extra_permissions': (),
 	'exclude': {
 		'override': False,
 		'apps': [],
@@ -48,3 +49,5 @@ TRANSLATION_FUNC = import_string(TABULAR_PERMISSIONS_CONFIG['custom_permission_t
 APPS_CUSTOMIZATION_FUNC = import_string(TABULAR_PERMISSIONS_CONFIG['apps_customization_func'])
 CUSTOM_PERMISSIONS_CUSTOMIZATION_FUNC = import_string(
 	TABULAR_PERMISSIONS_CONFIG['custom_permissions_customization_func'])
+
+EXTRA_PERMISSIONS = TABULAR_PERMISSIONS_CONFIG.get('extra_permissions', ())
