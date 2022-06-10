@@ -17,24 +17,24 @@ window.onload = function() {
                     $(elem).prop('checked', $el.prop('checked'));
                 })
             });
-        })
 
-        $('form').on('submit', function () {
-            var user_perms = [];
-            var table_permissions = $('#tabular_permissions');
-            var input_name = table_permissions.attr('data-input-name');
-            table_permissions.find("input[type=checkbox]").not('.select-all').each(function (i, elem) {
-                var $elem = $(elem);
-                if ($(elem).prop('checked')) {
-                    user_perms.push($elem.attr('data-perm-id'))
-                }
-            });
-            var user_group_permissions = $('[name=' + input_name +']');
-            var output = [];
-            $.each(user_perms, function (key, value) {
-                output.push('<option value="' + value + '" selected="selected" style="display:none"></option>');
-            });
-            user_group_permissions.append(output);
+            $('form').on('submit', function () {
+                var user_perms = [];
+                var table_permissions = $table;
+                var input_name = table_permissions.attr('data-input-name');
+                table_permissions.find("input[type=checkbox]").not('.select-all').each(function (i, elem) {
+                    var $elem = $(elem);
+                    if ($(elem).prop('checked')) {
+                        user_perms.push($elem.attr('data-perm-id'))
+                    }
+                });
+                var user_group_permissions = $('[name=' + input_name +']');
+                var output = [];
+                $.each(user_perms, function (key, value) {
+                    output.push('<option value="' + value + '" selected="selected" style="display:none"></option>');
+                });
+                user_group_permissions.append(output);
+            })
         })
     })(django.jQuery);
 };
