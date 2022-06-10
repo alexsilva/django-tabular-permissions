@@ -37,10 +37,10 @@ class TabularPermissionsWidget(FilteredSelectMultiple):
         self.managed_perms = []
         self.input_name = input_name  # in case of UserAdmin, it's 'user_permissions', GroupAdmin it's 'permissions'
         self.hide_original = True
-        self.org_choices = list(self.choices)
+        self.org_choices = None
 
     def get_table_context(self, name, value, attrs):
-        choices = self.org_choices
+        choices = self.choices if self.org_choices is None else self.org_choices
         apps_available = OrderedDict()  # []  # main container to send to template
         user_permissions = Permission.objects.filter(id__in=value or []).values_list('id', flat=True)
         all_perms = Permission.objects.all().values('id', 'codename', 'content_type_id').order_by('codename')
@@ -154,11 +154,13 @@ class TabularPermissionsWidget(FilteredSelectMultiple):
             'django_supports_view_permissions': VERSION >= (2, 1, 0),
             'reminder_choices': reminder_choices
         }
+        if self.org_choices is None:
+            self.org_choices = self.choices
+        self.choices = reminder_choices
         return ctx
 
     def get_context(self, name, value, attrs):
         ctx = self.get_table_context(name, value, attrs)
-        self.choices = ctx.get('reminder_choices', [])
         context = super().get_context(name, value, attrs)
         context['widget']['base_template_name'] = self.base_template_name
         context['widget']['table'] = ctx
