@@ -1,20 +1,24 @@
 window.onload = function() {
   (function($){
         $(".related-widget-wrapper:has(table)").addClass('related-widget-wrapper-user-permissions');
-        $('input.select-all.select-column').on('change', function () {
-            var $el = $(this),
-                state = $el.prop('checked');
-            // search for related columns.
-            $('#tabular_permissions').find("tr td." + $el.data('permission')).find('input').each(function (i, e) {
-                $(e).prop('checked', state)
-            })
-        });
-        $('input.select-all.select-row').on('change', function(){
-            var $this = $(this);
-            $this.parents('tr').find('.checkbox').not('.select-all').each(function(i,elem){
-                $(elem).prop('checked', $this.prop('checked'));
-            })
-        });
+        $('table.tabular-permissions:not(.processed)').each(function (){
+            var $table = $(this).addClass('processed');
+            $table.find('input.select-all.select-column').on('change', function () {
+                var $el = $(this),
+                    state = $el.prop('checked');
+                // search for related columns.
+                $table.find("tr td." + $el.data('permission')).find('input').each(function (i, e) {
+                    $(e).prop('checked', state)
+                });
+            });
+            $table.find('input.select-all.select-row').on('change', function(){
+                var $el = $(this);
+                $el.parents('tr').find('.checkbox').not('.select-all').each(function(i,elem){
+                    $(elem).prop('checked', $el.prop('checked'));
+                })
+            });
+        })
+
         $('form').on('submit', function () {
             var user_perms = [];
             var table_permissions = $('#tabular_permissions');
