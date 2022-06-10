@@ -10,12 +10,27 @@ window.onload = function() {
                 $table.find("tr td." + $el.data('permission')).find('input').each(function (i, e) {
                     $(e).prop('checked', state)
                 });
-            });
+            }).each(function (){
+                // keeps all columns checked.
+                var $el = $(this);
+                var $inputs = $table.find("tr td." + $el.data('permission')).find('input');
+                $el.prop('checked', $inputs.length === $inputs.filter(function () {
+                    return $(this).is(":checked");
+                }).length);
+            })
+
             $table.find('input.select-all.select-row').on('change', function(){
                 var $el = $(this);
                 $el.parents('tr').find('.checkbox').not('.select-all').each(function(i,elem){
                     $(elem).prop('checked', $el.prop('checked'));
                 })
+            }).each(function (){
+                // keeps all rows checked.
+                var $el = $(this),
+                    $inputs = $el.parents('tr').find('input.model-' + $el.data("model-name")).not('.select-all');
+                $el.prop('checked', $inputs.length === $inputs.filter(function () {
+                    return $(this).is(":checked");
+                }).length);
             });
 
             $('form').on('submit', function () {
