@@ -3,10 +3,10 @@
        style="width:100%" data-input-name="{{ widget.table.input_name }}">
     <thead>
     <tr>
-        <th> {% trans 'application'|capfirst %}</th>
-        <th>{% trans 'model'|capfirst %}</th>
+        <th class="tabular_perms_header"> {% trans 'application'|capfirst %}</th>
+        <th class="tabular_perms_header">{% trans 'model'|capfirst %}</th>
         {% if widget.table.django_supports_view_permissions %}
-        <th>
+        <th class="tabular_perms_header">
             {% trans 'View' %}
             <div>
                 <input type="checkbox" class="checkbox select-all select-column" data-permission="view"
@@ -15,7 +15,7 @@
             </div>
         </th>
         {% endif %}
-        <th>
+        <th class="tabular_perms_header">
             {% trans 'Add' %}
             <div>
                 <input type="checkbox" class="checkbox select-all select-column" data-permission="add"
@@ -23,7 +23,7 @@
                 {% trans 'All' %}
             </div>
         </th>
-        <th>
+        <th class="tabular_perms_header">
             {% trans 'Change' %}
             <div>
                 <input type="checkbox" class="checkbox select-all select-column" data-permission="change"
@@ -31,7 +31,7 @@
                 {% trans 'All' %}
             </div>
         </th>
-        <th>
+        <th class="tabular_perms_header">
             {% trans 'Delete' %}
             <div>
                 <input type="checkbox" class="checkbox select-all select-column" data-permission="delete"
@@ -42,7 +42,7 @@
 
         {% block extra_permission_headers %}{% endblock %}
         {% if  widget.table.custom_permissions_available %}
-            <th>
+            <th class="tabular_perms_header">
             {% trans 'other permissions'|capfirst %}
             </th>
         {% endif %}
@@ -177,7 +177,7 @@
             border-right: initial;
         }
 
-        th {
+        th.tabular_perms_header {
             text-decoration: underline;
         }
 
