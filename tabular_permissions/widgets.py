@@ -69,6 +69,18 @@ class TabularPermissionsWidget(FilteredSelectMultiple):
         # a global flag to either show or hide the other permission column in the table
         custom_permissions_available = False
 
+        cache_content_type = {}
+        for ct in ContentType.objects.all():
+            model = ct.model_class()
+            model_name = ct.model
+            if model:
+                model_name = ct.model
+                if USE_FOR_CONCRETE:
+                    model_name = model._meta.concrete_model.model_name
+
+            cache_key = (ct.app_label, model_name)
+            cache_content_type[cache_key] = ct
+
         for app in apps.get_app_configs():
             app_dict = {'verbose_name': force_text(app.verbose_name),
                         'label': app.label,
@@ -80,7 +92,8 @@ class TabularPermissionsWidget(FilteredSelectMultiple):
 
                 model = app.models[model_name]
                 opts = model._meta
-                ct_id = ContentType.objects.get_for_model(model, for_concrete_model=USE_FOR_CONCRETE).pk
+                cache_key = (opts.app_label, opts.model_name)
+                ct_id = cache_content_type.get(cache_key).pk
 
                 view_perm_name = get_perm_name(model_name, 'view')
                 add_perm_name = get_perm_name(model_name, 'add')
