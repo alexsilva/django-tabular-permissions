@@ -72,14 +72,13 @@ class TabularPermissionsWidget(FilteredSelectMultiple):
         cache_content_type = {}
         for ct in ContentType.objects.all():
             model = ct.model_class()
-            model_name = ct.model
             if model:
-                model_name = ct.model
+                opts = model._meta
                 if USE_FOR_CONCRETE:
-                    model_name = model._meta.concrete_model.model_name
-
-            cache_key = (ct.app_label, model_name)
-            cache_content_type[cache_key] = ct
+                    opts = model._meta.concrete_model
+                
+                cache_key = (opts.app_label, opts.model_name)
+                cache_content_type[cache_key] = ct
 
         for app in apps.get_app_configs():
             app_dict = {'verbose_name': force_text(app.verbose_name),
@@ -92,8 +91,15 @@ class TabularPermissionsWidget(FilteredSelectMultiple):
 
                 model = app.models[model_name]
                 opts = model._meta
+                if USE_FOR_CONCRETE:
+                    opts = model._meta.concrete_model
                 cache_key = (opts.app_label, opts.model_name)
-                ct_id = cache_content_type.get(cache_key).pk
+                
+                ct_obj = cache_content_type.get(cache_key)
+                if not ct_obj:
+                    ct_obj = ContentType.objects.get_for_model(model, for_concrete_model=USE_FOR_CONCRETE)
+
+                ct_id = ct_obj.pk
 
                 view_perm_name = get_perm_name(model_name, 'view')
                 add_perm_name = get_perm_name(model_name, 'add')
