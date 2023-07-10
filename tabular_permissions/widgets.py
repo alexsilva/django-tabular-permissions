@@ -7,7 +7,7 @@ from django.apps import apps
 from django.contrib.admin.widgets import FilteredSelectMultiple
 from django.contrib.auth.models import Permission
 from django.contrib.contenttypes.models import ContentType
-from django.utils.encoding import force_text
+from django.utils.encoding import force_str
 from .app_settings import (
     EXCLUDE_FUNCTION, EXCLUDE_APPS,
     EXCLUDE_MODELS, USE_FOR_CONCRETE,
@@ -76,12 +76,12 @@ class TabularPermissionsWidget(FilteredSelectMultiple):
                 opts = model._meta
                 if USE_FOR_CONCRETE:
                     opts = model._meta.concrete_model
-                
+
                 cache_key = (opts.app_label, opts.model_name)
                 cache_content_type[cache_key] = ct
 
         for app in apps.get_app_configs():
-            app_dict = {'verbose_name': force_text(app.verbose_name),
+            app_dict = {'verbose_name': force_str(app.verbose_name),
                         'label': app.label,
                         'models': OrderedDict()}
 
@@ -94,7 +94,7 @@ class TabularPermissionsWidget(FilteredSelectMultiple):
                 if USE_FOR_CONCRETE:
                     opts = model._meta.concrete_model
                 cache_key = (opts.app_label, opts.model_name)
-                
+
                 ct_obj = cache_content_type.get(cache_key)
                 if not ct_obj:
                     ct_obj = ContentType.objects.get_for_model(model, for_concrete_model=USE_FOR_CONCRETE)
@@ -154,8 +154,8 @@ class TabularPermissionsWidget(FilteredSelectMultiple):
                     app_dict['models'][model_name] = {
                         'model_name': model_name,
                         'model': model,
-                        'verbose_name_plural': force_text(opts.verbose_name_plural),
-                        'verbose_name': force_text(opts.verbose_name),
+                        'verbose_name_plural': force_str(opts.verbose_name_plural),
+                        'verbose_name': force_str(opts.verbose_name),
                         'view_perm_id': view_perm_id,
                         'view_perm_name': view_perm_name,
                         'add_perm_id': add_perm_id,

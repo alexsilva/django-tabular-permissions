@@ -17,7 +17,7 @@ TABULAR_PERMISSIONS_CONFIG = {
 	'apps_customization_func': 'tabular_permissions.helpers.apps_customization_func',
 	'custom_permissions_customization_func': 'tabular_permissions.helpers.custom_permissions_customization_func',
 }
-user_conf = getattr(settings, 'TABULAR_PERMISSIONS_CONFIG', False)
+user_conf = getattr(settings, 'TABULAR_PERMISSIONS_CONFIG', {})
 
 if user_conf:
 	# we update the exclude dict first
